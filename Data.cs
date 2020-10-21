@@ -13,37 +13,45 @@ namespace PhoneBook1
 
         public Contact search(string nameOrNumber) //search for contact
         {
+
             if(nameOrNumber == "")
             {
-                return null;
-            }
-            Char[] charry = nameOrNumber.ToCharArray();
-            if (char.IsDigit(charry[0]) == true)
-            {
-                foreach (var contact in contactList)
+                foreach (Contact contact in contactList)
                 {
-                    if (nameOrNumber == Convert.ToString(contact.newPhoneNumber.number))
+                    if (nameOrNumber == contact.number || nameOrNumber == contact.name)
                     {
                         return contact;
                     }
+                    else { return null; }
                 }
             }
-            if (char.IsLetter(charry[0]) == true)
+            string[] name = nameOrNumber.Split(' ');
+            string finalName="";
+            foreach (string s in name)
             {
-                foreach (var contact in contactList)
+                char[] a = s.ToLower().ToCharArray();
+                foreach (char c in a)
                 {
-                    string tempName = "";
-                    string[] name = nameOrNumber.Split(' ');
-                    foreach (string s in name)
+                    if (char.IsLetter(c) != true)
                     {
-                        char[] a = s.ToLower().ToCharArray();
+                        continue;
+                    }
+                    Char.ToLower(c);
+                }
+                if(a.Length != 0)
+                {
+                    if (Char.IsLetter(a[0]) == true)
+                    {
                         a[0] = char.ToUpper(a[0]);
-                        tempName += new string(a) + " ";
                     }
-                    if (tempName == Convert.ToString(contact.name))
-                    {
-                        return contact;
-                    }
+                }
+                finalName += new string(a) + " ";
+            }
+            foreach (Contact contact in contactList)
+            {
+                if(nameOrNumber == contact.number || finalName == contact.name)
+                {
+                    return contact;
                 }
             }
             return null;
@@ -53,7 +61,7 @@ namespace PhoneBook1
         {
             foreach(Contact c in contactList)
             {
-                if(c.name == contact.name || c.newPhoneNumber.number == contact.newPhoneNumber.number)
+                if(c.name == contact.name || c.number == contact.number)
                 {
                     return true;
                 }
@@ -102,10 +110,10 @@ namespace PhoneBook1
             List<hist> newList = new List<hist>();
             foreach(Contact contact in contactList)
             {
-                foreach(Contact.callHistory callHistory in contact.callHistories)
+                foreach(DateTime callHistory in contact.callHistories)
                 {
                     hist call = new hist();
-                    call.time = callHistory.time;
+                    call.time = callHistory;
                     call.name = contact.name;
                     newList.Add(call);
                 }
@@ -149,12 +157,12 @@ namespace PhoneBook1
                 foreach (Contact contact in contactList)
                 {
                     string callH = "";
-                    foreach (Contact.callHistory call in contact.callHistories)
+                    foreach (DateTime call in contact.callHistories)
                     {
-                        callH = callH + call.time + " " ;
+                        callH = callH + call + " " ;
                     }
-                    file.WriteLine(contact.name + "," + contact.mail + "," + contact.newPhoneNumber.number + "," +
-                        contact.newPhoneNumber.numberIntact + "," + callH);
+                    file.WriteLine(contact.name + "," + contact.mail + "," + contact.number + "," +
+                        contact.numberIntact + "," + callH);
                 }
                 file.Close();
                 file.Dispose();

@@ -15,8 +15,8 @@ namespace PhoneBook1
             {
                 Console.WriteLine("Welcome to your contact manager! Pick one of the following options:");
                 Console.WriteLine("1. Add Contact \n2. Edit Contact \n3. Delete Contact \n4. Call Contact " +
-                    "\n5. Browse Contacts \n6. Search Contact \n7. Import Contact \n8. Export Contact " +
-                    "\n9. Call History \n10. Exit");
+                    "\n5. Browse Contacts \n6. Search Contact \n7. Import Contact From FIle \n8. Export Contacts To CVS File " +
+                    "\n9. Call History \n10. Add Recent Call To Logs \n11. Exit \n");
                 string i = Console.ReadLine();
                 switch (i) 
                 {
@@ -94,6 +94,17 @@ namespace PhoneBook1
                         data.printAllCallHistory();
                         break;
                     case "10":
+                        Console.WriteLine("Which contact did you call");
+                        string str = Console.ReadLine();
+                        if(data.search(str) == null)
+                        {
+                            Console.WriteLine("The contact you looked for does not exist, or you had a typo.");
+                            break;
+                        }
+                        Contact contact5 = data.search(str);
+                        function.active.addCall(contact5);
+                        break;
+                    case "11":
                         program = false;
                         break;
                     default:

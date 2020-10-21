@@ -7,25 +7,36 @@ namespace PhoneBook1
 {
     class functions
     {
-        public Contact addNewContact(string name, string mail, string number, List<Contact.callHistory> calls)
+        public Contact addNewContact(string name, string mail, string number, List<DateTime> calls)
         {
             Contact newContact = new Contact();
             newContact.name = name;
             newContact.mail = mail;
-            newContact.newPhoneNumber.number = number;
+            newContact.number = number;
             newContact.callHistories = calls;
-            newContact.newPhoneNumber.numberIntact = numIntact(number);
+            newContact.numberIntact = numIntact(number);
             return newContact;
         }
 
         public bool numIntact(string number)
         {
-            char[] array = number.ToCharArray();
-            if(array[1] == '5' && array[0] == '0')
+            if(number == "")
             {
-                return true;
+                return false;
             }
-            return false;
+            char[] array = number.ToCharArray();
+            if(array.Length == 10)
+            {
+                if (array[1] == '5' && array[0] == '0')
+                {
+                    return true;
+                }
+                else { return false; }
+            }
+            else
+            {
+                return false;
+            }
         }
         public class activeContact //this class actively makes sure a contact is added correctly by the user. 
         {
@@ -44,8 +55,31 @@ namespace PhoneBook1
                 }
                 return true;
             }//makes sure a string is made only out of numbers
-            public string fixPhone(string contactNum) //makes sure only a proper phone number is entered
+
+            public void addCall(Contact contact)
             {
+                while (true)
+                {
+                    Console.WriteLine("Do you have any calls to add to your call history? To continue type anything, If not press enter.");
+                    string temp1 = Console.ReadLine();
+                    if (temp1 == "")
+                    {
+                        break;
+                    }
+                    DateTime history = new DateTime();
+                    Console.WriteLine("When did you call this contact?");
+                    DateTime a = new DateTime();
+                    history = fixTime();
+                    contact.callHistories.Add(history);
+
+                }
+            }
+            public string fixPhone(string contactNum) //makes sure only a proper phone number is entered(no letters)
+            {
+                if(contactNum == "")
+                {
+                    return "";
+                }
                 string num = contactNum;
                 bool isANum = true;
                 foreach (char c in num)
@@ -56,7 +90,7 @@ namespace PhoneBook1
                         break;
                     }
                 }
-                while (num.Length != 10 || isANum == false)
+                while (isANum == false || num == "")
                 {
                     Console.WriteLine("Your number is unavailable, please enter a different one.");
                     num = Console.ReadLine();
@@ -65,7 +99,6 @@ namespace PhoneBook1
                     {
                         if (char.IsDigit(c) == false)
                         {
-                            isANum = false;
                             zero++;
                             break;
                         }
@@ -74,6 +107,10 @@ namespace PhoneBook1
                     {
                         isANum = true;
                     }
+                    else
+                    {
+                        isANum = false;
+                    }
                 }
                 contactNum = num;
                 return contactNum;
@@ -81,42 +118,47 @@ namespace PhoneBook1
 
             public string fixName(string contactName)
             {
-                bool badName = true;
+                if(contactName == "")
+                {
+                    return "";
+                }
                 string finalName = "";
                 string[] name = contactName.Split(' ');
-                while (badName)
+                if(name.Length == 0)
                 {
-                    int OK = 0;
-                    if (name.Length != 2)
+                    int len = contactName.Length;
+                    string s = "";
+                    for(int i = 0; i<len; i++)
                     {
-                        OK++;
+                        s += " ";
                     }
-                    foreach (string s in name)
-                    {
-                        foreach (char c in s)
-                        {
-                            if (char.IsLetter(c) != true)
-                            {
-                                OK++;
-                                break;
-                            }
-                        }
-                    }
-                    if (OK == 0)
-                    {
-                        badName = false;
-                    }
-                    else
-                    {
-                        Console.WriteLine("Name is unavailable to use, please enter a proper name:");
-                        name = Console.ReadLine().Split(' ');
-                    }
+                    return s;
                 }
-
                 foreach (string s in name)
                 {
                     char[] a = s.ToLower().ToCharArray();
-                    a[0] = char.ToUpper(a[0]);
+                    if (a.Length == 0)
+                    {
+                        int len = contactName.Length;
+                        string S = "";
+                        for (int i = 0; i < len; i++)
+                        {
+                            S += " ";
+                        }
+                        return S;
+                    }
+                    foreach (char c in a)
+                    {
+                        if(char.IsLetter(c) != true)
+                        {
+                            continue;
+                        }
+                        Char.ToLower(c);
+                    }
+                    if(Char.IsLetter(a[0]) == true)
+                    {
+                        a[0] = char.ToUpper(a[0]);
+                    }
                     finalName += new string(a) + " ";
                 }
                 return finalName;
@@ -199,23 +241,7 @@ namespace PhoneBook1
                 Console.WriteLine("What is the contact's phone number?");
                 string phoneNum = Console.ReadLine();
                 string number = fixPhone(phoneNum);
-                List<Contact.callHistory> callHistories = new List<Contact.callHistory>();
-                while (true)
-                {
-                    Console.WriteLine("Do you have any calls to add to your call history? To continue type anything, If not press enter.");
-                    string temp1 = Console.ReadLine();
-                    if (temp1 == "")
-                    {
-                        break;
-                    }
-                    Contact.callHistory history = new Contact.callHistory();
-                    Console.WriteLine("When did you call this contact?");
-                    DateTime a = new DateTime();
-                    a = fixTime();
-                    history.time = a;
-                    callHistories.Add(history);
-
-                }
+                List<DateTime> callHistories = new List<DateTime>();
                 Contact newContact = functions.addNewContact(name, mail, number, callHistories);
                 if (data.duplicate(newContact) == true)
                 {
@@ -226,58 +252,56 @@ namespace PhoneBook1
 
             }
         }
+        
         public activeContact active = new activeContact();
-
-        public void sortDates(List<Contact.callHistory> callHistories) //sorts call histories by date
+        public void sortDates(List<DateTime> callHistories) //sorts call histories by date
         {
-            callHistories.Sort((a, b) => DateTime.Compare(b.time, a.time));
+            callHistories.Sort((a, b) => DateTime.Compare(b, a));
         }
         public void printContact(Contact contact) //prints the contact out
         {
             Console.WriteLine("Name:" + contact.name);
             Console.WriteLine("Email Address:" + contact.mail);
-            Console.WriteLine("Phone Number:" + contact.newPhoneNumber.number);
-            Console.WriteLine("Is Phone Number Active:" + contact.newPhoneNumber.numberIntact);
+            Console.WriteLine("Phone Number:" + contact.number);
+            Console.WriteLine("Is Phone Number Active:" + contact.numberIntact);
             printHistory(contact.callHistories);
             Console.WriteLine("");
         }
-        public void printHistory(List<Contact.callHistory> callHistories) //print the call history logs for one contact
+        public void printHistory(List<DateTime> callHistories) //print the call history logs for one contact
         {
             sortDates(callHistories);
             foreach (var history in callHistories)
             {
-                Console.WriteLine(history.time);
+                Console.WriteLine(history);
             }
         }
 
         public void call(Contact contact) //option to call a contact
         {
-            Contact.callHistory call = new Contact.callHistory();
-            call.time = DateTime.Now;
-            contact.callHistories.Add(call);
+            contact.callHistories.Add(DateTime.Now);
         }
 
         public void editContact(Contact contact) //edit a contact from the contact book
         {
             activeContact activeContact = new activeContact();
-            Console.WriteLine("What would like to change the name to? If you don't want to change the name press enter.");
+            Console.WriteLine("What would like to change the name to? If you don't want to change the name enter ;");
             string temp = Console.ReadLine();
-            if (temp != "")
+            if (temp != ";")
             {
                 contact.name = activeContact.fixName(temp);
             }
-            Console.WriteLine("What would like to change the mail to? If you don't want to change the mail press enter.");
+            Console.WriteLine("What would like to change the mail to? If you don't want to change the mail enter ;");
             temp = Console.ReadLine();
-            if (temp != "")
+            if (temp != ";")
             {
                 contact.mail = temp;
             }
-            Console.WriteLine("What would like to change the number to? If you don't want to change the number press enter.");
+            Console.WriteLine("What would like to change the number to? If you don't want to change the number enter ;");
             temp = Console.ReadLine();
-            if (temp != "")
+            if (temp != ";")
             {
-                contact.newPhoneNumber.number = activeContact.fixPhone(temp);
-                contact.newPhoneNumber.numberIntact = numIntact(temp);
+                contact.number = activeContact.fixPhone(temp);
+                contact.numberIntact = numIntact(temp);
             }
 
 
@@ -329,6 +353,7 @@ namespace PhoneBook1
         {
             string num = contactNum;
             bool isANum = true;
+            if(contactNum == "") { return ""; }
             foreach (char c in num)
             {
                 if (char.IsDigit(c) == false)
@@ -336,10 +361,6 @@ namespace PhoneBook1
                     isANum = false;
                     break;
                 }
-            }
-            if(num.Length != 10)
-            {
-                isANum = false;
             }
             if(isANum == false)
             {
@@ -361,7 +382,7 @@ namespace PhoneBook1
                 switch (i)
                 {
                     case 0:
-                        temp = isValidName(contactDetails[i]);
+                        temp = active.fixName(contactDetails[i]);
                         if(temp == null)
                         {
                             return null;
@@ -377,8 +398,8 @@ namespace PhoneBook1
                         {
                             return null;
                         }
-                        newContact.newPhoneNumber.number = temp;
-                        newContact.newPhoneNumber.numberIntact = numIntact(temp);
+                        newContact.number = temp;
+                        newContact.numberIntact = numIntact(temp);
                         break;
                 }
             }
