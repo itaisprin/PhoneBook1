@@ -13,7 +13,7 @@ namespace PhoneBook1
             functions function = new functions();
             while (program) // the program
             {
-                Console.WriteLine("Welcome to your contact manager! Pick one of the following options:");
+                Console.WriteLine("\nWelcome to your contact manager! Pick one of the following options:");
                 Console.WriteLine("1. Add Contact \n2. Edit Contact \n3. Delete Contact \n4. Call Contact " +
                     "\n5. Browse Contacts \n6. Search Contact \n7. Import Contact From FIle \n8. Export Contacts To CVS File " +
                     "\n9. Call History \n10. Add Recent Call To Logs \n11. Exit \n");
@@ -33,7 +33,7 @@ namespace PhoneBook1
                             Console.WriteLine("The contact you looked for does not exist, or you had a typo.");
                             break;
                         }
-                        function.editContact(contact1);
+                        function.editContact(contact1,data);
                         break;
                     case "3":
                         Console.WriteLine("Write name or number of contact you would lke to delete");
@@ -56,13 +56,13 @@ namespace PhoneBook1
                         break;
                     case "6":
                         Console.WriteLine("Which contact would you like to look for?Enter name or number.");
-                        Contact contact3 = data.search(Console.ReadLine());
-                        if (contact3 == null)
+                        data.dynamicSearch(Console.ReadLine());
+                        /*if (contact3 == null)
                         {
                             Console.WriteLine("The contact you looked for does not exist, or you had a typo.");
                             break;
                         }
-                        function.printContact(contact3);
+                        function.printContact(contact3);*/
                         break;
                     case "7":
                         Console.WriteLine("Type location of the file you woud like to import a contact from. The format should be - @C:\\ab\\bc\\file.txt and so on");
@@ -111,7 +111,8 @@ namespace PhoneBook1
                         break;
                 }
             }
-            
+
         }
+
     }
 }

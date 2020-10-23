@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 
 namespace PhoneBook1
@@ -17,6 +18,7 @@ namespace PhoneBook1
             newContact.numberIntact = numIntact(number);
             return newContact;
         }
+
 
         public bool numIntact(string number)
         {
@@ -196,7 +198,7 @@ namespace PhoneBook1
                     {
                         day = "-1";
                     }
-                } while ((Convert.ToInt32(day) < 01) || (Convert.ToInt32(day)) > 31);
+                } while ((Convert.ToInt32(day) < 01) || (Convert.ToInt32(day)) > DateTime.DaysInMonth(Convert.ToInt32(year), Convert.ToInt32(month)));
                 do
                 {
                     Console.WriteLine("Enter Hour");
@@ -281,30 +283,51 @@ namespace PhoneBook1
             contact.callHistories.Add(DateTime.Now);
         }
 
-        public void editContact(Contact contact) //edit a contact from the contact book
+        public void editContact(Contact contact, Data data) //edit a contact from the contact book
         {
-            activeContact activeContact = new activeContact();
-            Console.WriteLine("What would like to change the name to? If you don't want to change the name enter ;");
-            string temp = Console.ReadLine();
-            if (temp != ";")
+            Contact contact1 = new Contact();
+            contact1.name = contact.name;
+            contact1.mail = contact.mail;
+            contact1.number = contact.number;
+            contact1.numberIntact = contact.numberIntact;
+            int counter = 0;
+            while (true)
             {
-                contact.name = activeContact.fixName(temp);
+                Console.WriteLine("What would like to change the name to? If you don't want to change the name type ;");
+                string temp = Console.ReadLine();
+                contact1.name = active.fixName(temp);
+                if (temp != ";")
+                {
+                    if (data.search(temp) != null)
+                    {
+                        Console.WriteLine("This name already exists in the contact list");
+                        counter++;
+                        break;
+                    }
+                }                  
+                Console.WriteLine("What would like to change the mail to? If you don't want to change the mail type ;");
+                temp = Console.ReadLine();
+                if (temp != ";")
+                {
+                    contact1.mail = temp;
+                }
+                Console.WriteLine("What would like to change the number to? If you don't want to change the number type ;");
+                temp = Console.ReadLine();
+                contact1.number = active.fixPhone(temp);
+                if (temp != ";")
+                {
+                    if (data.search(temp) != null)
+                    {
+                        Console.WriteLine("This number already exists in the contact list");
+                        counter++;
+                        break;
+                    }
+                } 
+                contact1.numberIntact = numIntact(contact1.number);
+                if (counter == 0)
+                    contact = contact1;
+                break;
             }
-            Console.WriteLine("What would like to change the mail to? If you don't want to change the mail enter ;");
-            temp = Console.ReadLine();
-            if (temp != ";")
-            {
-                contact.mail = temp;
-            }
-            Console.WriteLine("What would like to change the number to? If you don't want to change the number enter ;");
-            temp = Console.ReadLine();
-            if (temp != ";")
-            {
-                contact.number = activeContact.fixPhone(temp);
-                contact.numberIntact = numIntact(temp);
-            }
-
-
         }
 
         public string isValidName(string contactName) //make sure only a valid name is entered

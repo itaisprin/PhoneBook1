@@ -69,6 +69,33 @@ namespace PhoneBook1
             return false;
         }
 
+        public Contact duplicate(Contact contact, bool boolean) //checks for duplicate names and returns the existing contact
+        {
+            foreach (Contact c in contactList)
+            {
+                if (c.name == contact.name || c.number == contact.number)
+                {
+                    return contact;
+                }
+            }
+            return null;
+        }
+        public Contact duplicate(Contact contact, bool boolean, bool boolean2)
+        {
+            List<Contact> dupList = contactList;
+            dupList.Remove(duplicate(contact, true));
+            {
+                foreach (Contact c in dupList)
+                {
+                    if (c.name == contact.name || c.number == contact.number)
+                    {
+                        return c;
+                    }
+                }
+                return null;
+            }
+        }
+
         public void deleteContact(string nameOrNumber) //delete contacts
         {
             bool deleted = false;
@@ -140,6 +167,33 @@ namespace PhoneBook1
                 }
                 if(duplicate(contact) == true)
                 {
+                    Console.WriteLine("You tried to enter the following contact:\n");
+                    function.printContact(contact);
+                    Contact contact1 = duplicate(contact, true);
+                    Console.WriteLine("The following contact already exists:\n");
+                    function.printContact(contact1);
+                    if (duplicate(contact, true, true) != null)
+                    {
+                        Console.WriteLine("The following contact also already exists:\n");
+                        function.printContact(duplicate(contact, true, true));
+                        Console.WriteLine("Unfortunately, we could not add your contact the the book.");
+                        break;
+                    }
+                    Console.WriteLine("What would you like to do?\n1.Replace old contact with new one.\n2.Keep old contact and discard new one.");
+                    string temp = Console.ReadLine();
+                    switch (temp)
+                    {
+                        case "1":
+
+                            contactList.Add(contact);
+                            contactList.Remove(contact1);
+                            break;
+                        case "2":
+                            break;
+                        default:
+                            break;
+
+                    }
                     break;
                 }
                 contactList.Add(contact);
@@ -167,6 +221,28 @@ namespace PhoneBook1
                 file.Close();
                 file.Dispose();
             }
+        }
+
+        public void dynamicSearch(string nameOrNumber)
+        {
+            sortContacts();
+            List<Contact> dynamicList = new List<Contact>();
+            nameOrNumber.ToLower();
+            foreach(Contact contact in contactList)
+            {
+                if (contact.name.ToLower().Contains(nameOrNumber) == true || contact.number.Contains(nameOrNumber) == true)
+                    dynamicList.Add(contact);
+            }
+            while (dynamicList.ToArray().Length != 0)
+            {
+                foreach(Contact c in dynamicList)
+                {
+                    function.printContact(c);
+                }
+                break;
+            }
+            if(dynamicList.ToArray().Length == 0)
+                Console.WriteLine("Contact couldn't be found");
         }
     }
 }
